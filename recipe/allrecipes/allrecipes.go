@@ -112,6 +112,8 @@ type Recipe struct {
 	ItemListElement []ListElement `json:"itemListElement"`
 }
 
+const URL = "https://www.allrecipes.com/recipe/"
+
 func GetRecipe(URL string) (Recipe, error) {
 	node := myutils.GetHtmlNode(URL)
 	

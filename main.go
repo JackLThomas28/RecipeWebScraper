@@ -20,15 +20,18 @@ func main() {
 	var savedRecipes []allrecipes.Recipe
 	json.Unmarshal([]byte(body), &savedRecipes)
 
+	// Initializations for the first recipe to scrape
 	recipeNum := 15195
 	index := 0
 	const LIMIT = 50
+
 	for index < LIMIT {
-		recipeNum += index
+		recipeNum += 1
 
 		log.Printf("Recipes scraped so far: %d", index)
 
-		URL := "https://www.allrecipes.com/recipe/" + strconv.Itoa(recipeNum) + "/"
+		URL := allrecipes.URL + strconv.Itoa(recipeNum) + "/"
+		log.Printf("URL: %s", URL)
 		// Get the recipe in json form
 		recipe, err := allrecipes.GetRecipe(URL)
 		if err != nil {
@@ -46,9 +49,8 @@ func main() {
 		// If we have already saved the recipe, don't re-save
 		if !duplicate {
 			savedRecipes = append(savedRecipes, recipe)
+			index++
 		}
-
-		index++
 	}
 
 	// Save all recipes
