@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const FILE_NAME = "allrecipes.json"
+	const FILE_NAME = allrecipes.FILE_NAME
 
 	// Read in saved recipes
 	body, err := ioutil.ReadFile(FILE_NAME)
@@ -20,37 +20,38 @@ func main() {
 	var savedRecipes []allrecipes.Recipe
 	json.Unmarshal([]byte(body), &savedRecipes)
 
+	// Store the saved recipes in a map
+	recipeMap := make(map[int]allrecipes.Recipe)
+	for i := 0; i < len(savedRecipes); i++ {
+		recipeMap[savedRecipes[i].ID] = savedRecipes[i]
+	}
+
 	// Initializations for the first recipe to scrape
-	recipeNum := 15195
+	recipeID := 15195
 	index := 0
-	const LIMIT = 50
+	const LIMIT = 5
 
 	for index < LIMIT {
-		recipeNum += 1
+		recipeID += 1
 
-		log.Printf("Recipes scraped so far: %d", index)
-
-		URL := allrecipes.URL + strconv.Itoa(recipeNum) + "/"
+		URL := allrecipes.URL + strconv.Itoa(recipeID) + "/"
 		log.Printf("URL: %s", URL)
 		// Get the recipe in json form
-		recipe, err := allrecipes.GetRecipe(URL)
+		recipe, err := allrecipes.GetRecipe(URL, recipeID)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		// Check the URL to see if we've previously saved the recipe
-		duplicate := false
-		for i,_ := range savedRecipes {
-			if recipe.MainEntityOfPage == savedRecipes[i].MainEntityOfPage {
-				duplicate = true
-			}
-		}
+		_, duplicate := recipeMap[recipe.ID]
 
 		// If we have already saved the recipe, don't re-save
 		if !duplicate {
 			savedRecipes = append(savedRecipes, recipe)
+			recipeMap[recipe.ID] = recipe
 			index++
 		}
+		log.Printf("Recipes scraped so far: %d", index)
 	}
 
 	// Save all recipes

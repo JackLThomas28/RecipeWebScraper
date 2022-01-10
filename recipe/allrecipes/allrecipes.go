@@ -90,6 +90,7 @@ type Review struct {
 }
 
 type Recipe struct {
+	ID int
 	Context string `json:"@context"`
 	Type string `json:"@type"`
 	MainEntityOfPage string `json:"mainEntityOfPage"`
@@ -113,8 +114,9 @@ type Recipe struct {
 }
 
 const URL = "https://www.allrecipes.com/recipe/"
+const FILE_NAME = "allrecipes.json"
 
-func GetRecipe(URL string) (Recipe, error) {
+func GetRecipe(URL string, ID int) (Recipe, error) {
 	node := myutils.GetHtmlNode(URL)
 	
 	const RECIPEINDEX = 1
@@ -136,5 +138,6 @@ func GetRecipe(URL string) (Recipe, error) {
 	// for i,_ := range recipe[RECIPEINDEX].RecipeIngredient {
 	// 	log.Printf(recipe[RECIPEINDEX].RecipeIngredient[i])
 	// }
+	recipe[RECIPEINDEX].ID = ID
 	return recipe[RECIPEINDEX], nil
 }
